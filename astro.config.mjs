@@ -7,7 +7,8 @@ import sitemap from '@astrojs/sitemap';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://nanatengo.github.io/nanatengo/', // 本番URLに変更してください
+  site: 'https://nanatengo.github.io',
+  base: '/nanatengo',
   vite: {
     plugins: [tailwindcss()]
   },
