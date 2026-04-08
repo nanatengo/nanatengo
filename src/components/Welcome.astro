@@ -1,0 +1,171 @@
+---
+
+---
+
+<div
+    id="welcome-screen"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-base text-primary font-heading text-6xl md:text-8xl flex-col transition-opacity duration-1000"
+    style="touch-action: none;"
+>
+    <!-- Ink Strokes — exact same structure as main bg (Layout.astro) -->
+    <div
+        class="absolute inset-0 pointer-events-none overflow-hidden mix-blend-multiply opacity-80"
+    >
+        <!-- Left Edge -->
+        <div class="absolute inset-y-0 left-0 w-[28vw]">
+            <div
+                id="ws-1"
+                class="bg-stroke-blue"
+                style="position:absolute;width:120vw;height:70px;transform:rotate(-35deg);top:-5%;left:-60vw;opacity:0;transition:opacity 0.5s ease-out;"
+            >
+            </div>
+            <div
+                id="ws-2"
+                class="bg-stroke-red"
+                style="position:absolute;width:100vw;height:55px;transform:rotate(-35deg);top:18%;left:-50vw;opacity:0;transition:opacity 0.5s ease-out;"
+            >
+            </div>
+            <div
+                id="ws-3"
+                class="bg-stroke-green"
+                style="position:absolute;width:110vw;height:50px;transform:rotate(-35deg);top:38%;left:-60vw;opacity:0;transition:opacity 0.5s ease-out;"
+            >
+            </div>
+            <div
+                id="ws-4"
+                class="bg-stroke-purple"
+                style="position:absolute;width:120vw;height:45px;transform:rotate(45deg);bottom:30%;left:-50vw;opacity:0;transition:opacity 0.5s ease-out;"
+            >
+            </div>
+            <div
+                id="ws-5"
+                class="bg-stroke-orange"
+                style="position:absolute;width:130vw;height:40px;transform:rotate(42deg);bottom:20%;left:-65vw;opacity:0;transition:opacity 0.5s ease-out;"
+            >
+            </div>
+            <div
+                id="ws-6"
+                class="bg-stroke-green"
+                style="position:absolute;absolute;width:130vw;height:60px;transform:rotate(35deg);bottom:0%;left:-65vw;opacity:0;transition:opacity 0.5s ease-out;"
+            >
+            </div>
+        </div>
+        <!-- Right Edge -->
+        <div class="absolute inset-y-0 right-0 w-[28vw]">
+            <div
+                id="ws-7"
+                class="bg-stroke-blue"
+                style="position:absolute;width:110vw;height:40px;transform:rotate(35deg);top:5%;right:-60vw;opacity:0;transition:opacity 0.5s ease-out;"
+            >
+            </div>
+            <div
+                id="ws-8"
+                class="bg-stroke-red"
+                style="position:absolute;width:120vw;height:55px;transform:rotate(35deg);top:20%;right:-50vw;opacity:0;transition:opacity 0.5s ease-out;"
+            >
+            </div>
+            <div
+                id="ws-9"
+                class="bg-stroke-blue"
+                style="position:absolute;width:140vw;height:45px;transform:rotate(-40deg);bottom:25%;right:-60vw;opacity:0;transition:opacity 0.5s ease-out;"
+            >
+            </div>
+            <div
+                id="ws-10"
+                class="bg-stroke-red"
+                style="position:absolute;width:140vw;height:45px;transform:rotate(-38deg);bottom:10%;right:-60vw;opacity:0;transition:opacity 0.5s ease-out;"
+            >
+            </div>
+            <div
+                id="ws-11"
+                class="bg-stroke-purple"
+                style="position:absolute;width:100vw;height:65px;transform:rotate(-35deg);bottom:-5%;right:-50vw;opacity:0;transition:opacity 0.5s ease-out;"
+            >
+            </div>
+        </div>
+    </div>
+
+    <!-- Text (shows after strokes are drawn) -->
+    <div class="relative z-10 flex flex-col items-center">
+        <div class="overflow-hidden mb-4">
+            <span
+                id="w-welcome"
+                class="block opacity-0 translate-y-10 transition-all duration-500 ease-out"
+                >WELCOME</span
+            >
+        </div>
+        <div class="overflow-hidden mb-4">
+            <span
+                id="w-to"
+                class="block text-3xl md:text-5xl opacity-0 translate-y-10 transition-all duration-500 ease-out text-accent-orange"
+                >TO</span
+            >
+        </div>
+        <div class="overflow-hidden">
+            <span
+                id="w-studio"
+                class="block opacity-0 translate-y-10 transition-all duration-500 ease-out"
+                >7.5 STUDIO</span
+            >
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        document.body.style.overflow = "hidden";
+
+        const screen = document.getElementById("welcome-screen");
+        const wWelcome = document.getElementById("w-welcome");
+        const wTo = document.getElementById("w-to");
+        const wStudio = document.getElementById("w-studio");
+
+        const strokeIds = [
+            "ws-1",
+            "ws-2",
+            "ws-3",
+            "ws-4",
+            "ws-5",
+            "ws-6",
+            "ws-7",
+            "ws-8",
+            "ws-9",
+            "ws-10",
+            "ws-11",
+        ];
+
+        if (!screen || !wWelcome || !wTo || !wStudio) {
+            document.body.style.overflow = "";
+            return;
+        }
+
+        // Phase 1: Ink strokes appear one by one (0–600ms)
+        strokeIds.forEach((id, i) => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            setTimeout(() => {
+                el.style.opacity = "1";
+            }, i * 70);
+        });
+
+        // Phase 2: Text appears after strokes (~700ms)
+        setTimeout(() => {
+            wWelcome.classList.remove("opacity-0", "translate-y-10");
+        }, 700);
+        setTimeout(() => {
+            wTo.classList.remove("opacity-0", "translate-y-10");
+        }, 1100);
+        setTimeout(() => {
+            wStudio.classList.remove("opacity-0", "translate-y-10");
+        }, 1500);
+
+        // Phase 3: Fade out
+        setTimeout(() => {
+            screen.classList.add("opacity-0");
+            setTimeout(() => {
+                screen.style.display = "none";
+                document.body.style.overflow = "";
+            }, 1000);
+        }, 3000);
+    });
+</script>

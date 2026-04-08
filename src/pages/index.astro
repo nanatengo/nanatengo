@@ -1,17 +1,88 @@
 ---
-
+import Layout from "../layouts/Layout.astro";
+import Welcome from "../components/Welcome.astro";
+import Hero from "../components/Hero.astro";
+import ArtistPhoto from "../components/ArtistPhoto.astro";
+import News from "../components/News.astro";
+import Members from "../components/Members.astro";
+import SNS from "../components/SNS.astro";
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout title="7.5 (nanatengo) | JAZZ FUNK SESSION BAND">
+    <Welcome />
+
+    <header class="fixed top-0 left-0 w-full z-40 px-6 py-6 flex justify-between items-center mix-blend-multiply opacity-0 animate-fade-in" style="animation-delay: 3s;">
+        <div class="font-heading text-2xl tracking-tighter text-primary">7.5</div>
+        <nav aria-label="メインナビゲーション">
+            <ul class="flex gap-8 text-[10px] font-bold tracking-[0.3em] uppercase text-primary/60">
+                <li><a href="#news" class="hover:text-accent-orange transition-colors">News</a></li>
+                <li><a href="#members" class="hover:text-accent-orange transition-colors">Members</a></li>
+                <li><a href="#sns-contact" class="hover:text-accent-orange transition-colors">Connect</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main id="main-content">
+        <Hero />
+        <ArtistPhoto />
+        <News />
+        <Members />
+        <SNS />
+    </main>
+
+    <footer
+        class="w-full py-12 text-center bg-primary text-base mt-32 rounded-t-[3rem]"
+    >
+        <h2 class="text-3xl font-heading mb-4 text-accent-orange">
+            7.5 NANATENGO
+        </h2>
+        <p class="font-bold tracking-[0.2em] text-xs opacity-70 uppercase mb-8">
+            Jazz Funk Session Band
+        </p>
+        <p class="font-heading text-xl tracking-widest opacity-50">
+            &copy; 7.5 NANATENGO
+        </p>
+    </footer>
+
+    <script>
+        // Standard Intersection Observer for reveal animations (Zero Library)
+        document.addEventListener("DOMContentLoaded", () => {
+            const observerOptions = {
+                root: null,
+                rootMargin: "0px",
+                threshold: 0.15,
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        // Apply transition classes
+                        entry.target.classList.remove(
+                            "opacity-0",
+                            "translate-y-10",
+                        );
+                        entry.target.classList.add(
+                            "opacity-100",
+                            "translate-y-0",
+                            "transition-all",
+                            "duration-1000",
+                            "ease-out",
+                        );
+
+                        // Stop observing once revealed
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            // Observe all elements with .reveal-on-scroll class
+            const revealElements =
+                document.querySelectorAll(".reveal-on-scroll");
+            revealElements.forEach((el) => {
+                // Ensure initial state
+                el.classList.add("opacity-0", "translate-y-10");
+                observer.observe(el);
+            });
+        });
+    </script>
+</Layout>

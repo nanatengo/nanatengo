@@ -1,0 +1,226 @@
+---
+import { getCollection, render } from "astro:content";
+
+const allNews = await getCollection("news");
+const sortedNews = allNews.sort(
+    (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+const recentNews = sortedNews.slice(0, 3);
+const pastNews = sortedNews.slice(3);
+
+// Render all articles server-side for modal display
+const renderedNews = await Promise.all(
+    sortedNews.map(async (news) => {
+        const { Content } = await render(news);
+        return { news, Content };
+    }),
+);
+---
+
+<section
+    id="news"
+    class="py-24 px-4 md:px-8 max-w-4xl mx-auto relative z-10 w-full min-h-[50vh]"
+>
+    <h2
+        class="text-6xl md:text-8xl font-heading mb-12 flex items-center gap-4 text-primary opacity-0 translate-y-10 reveal-on-scroll"
+    >
+        NEWS
+        <span class="h-[4px] bg-primary flex-grow opacity-20 mt-4 rounded-full"
+        ></span>
+    </h2>
+
+    <ul class="space-y-6 opacity-0 translate-y-10 reveal-on-scroll delay-100">
+        {
+            recentNews.map((news) => (
+                <li class="group relative border-b-2 border-primary/20 pb-6 hover:border-primary/60 transition-colors cursor-pointer p-4 -mx-4 rounded-lg hover:bg-white/10 backdrop-blur-sm">
+                    <button
+                        data-news-id={news.id}
+                        class="news-open-btn w-full flex flex-col md:flex-row md:items-baseline gap-2 md:gap-8 text-left"
+                    >
+                        <time class="font-bold text-accent-green tracking-widest text-sm uppercase">
+                            {news.data.date
+                                .toISOString()
+                                .split("T")[0]
+                                .replace(/-/g, ".")}
+                        </time>
+                        <h3 class="text-xl md:text-2xl font-bold group-hover:text-accent-orange transition-colors">
+                            {news.data.title}
+                        </h3>
+                        <span class="ml-auto text-sm text-primary/40 group-hover:text-accent-orange transition-colors font-bold tracking-widest uppercase hidden md:inline">
+                            Read →
+                        </span>
+                    </button>
+                </li>
+            ))
+        }
+        {
+            pastNews.map((news) => (
+                <li class="hidden past-news-item group relative border-b-2 border-primary/20 pb-6 hover:border-primary/60 transition-colors cursor-pointer p-4 -mx-4 rounded-lg hover:bg-white/10 backdrop-blur-sm">
+                    <button
+                        data-news-id={news.id}
+                        class="news-open-btn w-full flex flex-col md:flex-row md:items-baseline gap-2 md:gap-8 text-left"
+                    >
+                        <time class="font-bold text-accent-green tracking-widest text-sm uppercase">
+                            {news.data.date
+                                .toISOString()
+                                .split("T")[0]
+                                .replace(/-/g, ".")}
+                        </time>
+                        <h3 class="text-xl md:text-2xl font-bold group-hover:text-accent-orange transition-colors">
+                            {news.data.title}
+                        </h3>
+                        <span class="ml-auto text-sm text-primary/40 group-hover:text-accent-orange transition-colors font-bold tracking-widest uppercase hidden md:inline">
+                            Read →
+                        </span>
+                    </button>
+                </li>
+            ))
+        }
+    </ul>
+
+    {
+        pastNews.length > 0 && (
+            <div class="mt-12 text-center opacity-0 translate-y-10 reveal-on-scroll delay-200">
+                <button
+                    id="show-more-news"
+                    class="px-8 py-3 border-2 border-primary text-primary font-bold tracking-widest uppercase hover:bg-primary hover:text-base transition-colors rounded-full text-sm"
+                >
+                    SHOW MORE ▼
+                </button>
+            </div>
+        )
+    }
+</section>
+
+<!-- Modal Overlay -->
+<div
+    id="news-modal"
+    class="fixed inset-0 z-[200] flex items-end md:items-center justify-center p-0 md:p-8 opacity-0 pointer-events-none transition-opacity duration-300"
+>
+    <!-- Backdrop -->
+    <div
+        id="news-modal-backdrop"
+        class="absolute inset-0 bg-primary/50 backdrop-blur-sm"
+    >
+    </div>
+
+    <!-- Panel -->
+    <div
+        id="news-modal-panel"
+        class="relative w-full md:max-w-2xl max-h-[85vh] overflow-y-auto bg-base rounded-t-3xl md:rounded-3xl shadow-2xl translate-y-8 transition-transform duration-300 flex flex-col"
+    >
+        <!-- Header -->
+        <div
+            class="sticky top-0 bg-base/95 backdrop-blur-sm px-8 pt-8 pb-4 border-b border-primary/10 flex items-start justify-between"
+        >
+            <div>
+                <time
+                    id="modal-date"
+                    class="font-bold text-accent-green tracking-widest text-xs uppercase"
+                ></time>
+                <h2
+                    id="modal-title"
+                    class="font-heading text-3xl md:text-4xl text-primary mt-1"
+                >
+                </h2>
+            </div>
+            <button
+                id="news-modal-close"
+                class="ml-4 mt-1 flex-shrink-0 w-10 h-10 rounded-full bg-primary/10 hover:bg-accent-orange hover:text-white text-primary transition-colors flex items-center justify-center text-xl font-bold"
+            >
+                ✕
+            </button>
+        </div>
+        <!-- Body -->
+        <div
+            id="modal-body"
+            class="px-8 py-6 text-primary/90 leading-relaxed space-y-4 text-base [&>p]:leading-8 [&>strong]:font-bold [&>a]:text-accent-orange [&>a]:underline [&>h2]:font-heading [&>h2]:text-2xl [&>h2]:mt-6"
+        >
+        </div>
+    </div>
+</div>
+
+<!-- Hidden article content store (server-rendered) -->
+<div id="news-content-store" class="hidden">
+    {
+        renderedNews.map(({ news, Content }) => (
+            <div
+                data-news-id={news.id}
+                data-news-title={news.data.title}
+                data-news-date={news.data.date
+                    .toISOString()
+                    .split("T")[0]
+                    .replace(/-/g, ".")}
+            >
+                <Content />
+            </div>
+        ))
+    }
+</div>
+
+<script>
+    function setupNews() {
+        const newsSection = document.getElementById("news");
+        const modal = document.getElementById("news-modal");
+        const panel = document.getElementById("news-modal-panel");
+        const backdrop = document.getElementById("news-modal-backdrop");
+        const closeBtn = document.getElementById("news-modal-close");
+        const modalTitle = document.getElementById("modal-title");
+        const modalDate = document.getElementById("modal-date");
+        const modalBody = document.getElementById("modal-body");
+        const store = document.getElementById("news-content-store");
+
+        if (!newsSection || !modal || !panel || !backdrop || !closeBtn || !modalTitle || !modalDate || !modalBody || !store) return;
+
+        function openModal(newsId: string) {
+            const entry = store?.querySelector(`[data-news-id="${newsId}"]`);
+            if (!entry) return;
+
+            modalTitle!.textContent = entry.getAttribute("data-news-title") || "";
+            modalDate!.textContent = entry.getAttribute("data-news-date") || "";
+            modalBody!.innerHTML = entry.innerHTML;
+
+            modal!.classList.remove("opacity-0", "pointer-events-none");
+            panel!.classList.remove("translate-y-8");
+            document.body.style.overflow = "hidden";
+        }
+
+        function closeModal() {
+            modal!.classList.add("opacity-0", "pointer-events-none");
+            panel!.classList.add("translate-y-8");
+            document.body.style.overflow = "";
+        }
+
+        // Event delegation scoped ONLY to the news section to avoid global duplication during HMR
+        newsSection.addEventListener("click", (e: Event) => {
+            const target = e.target;
+            if (!(target instanceof HTMLElement)) return;
+
+            const openBtn = target.closest<HTMLElement>(".news-open-btn");
+            if (openBtn) {
+                const id = openBtn.getAttribute("data-news-id");
+                if (id) openModal(id);
+                return;
+            }
+
+            const showMoreBtn = target.closest<HTMLElement>("#show-more-news");
+            if (showMoreBtn) {
+                const pastItems = newsSection.querySelectorAll<HTMLElement>(".past-news-item");
+                pastItems.forEach((item) => item.classList.remove("hidden"));
+                showMoreBtn.classList.add("hidden");
+            }
+        });
+
+        // Modal specific listeners
+        closeBtn.addEventListener("click", closeModal);
+        backdrop.addEventListener("click", closeModal);
+
+        const handleKeydown = (e: KeyboardEvent) => {
+            if (e.key === "Escape") closeModal();
+        };
+        document.addEventListener("keydown", handleKeydown);
+    }
+
+    // Run setup
+    setupNews();
+</script>
