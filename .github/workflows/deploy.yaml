@@ -1,13 +1,10 @@
 name: Deploy to GitHub Pages
 
 on:
-  # mainブランチにpushされた時に実行
   push:
     branches: [main]
-  # 手動実行も可能にする
   workflow_dispatch:
 
-# GitHub Pagesへのデプロイに必要な権限設定
 permissions:
   contents: read
   pages: write
@@ -39,11 +36,11 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24" # Astroが要求する最新の安定版(LTS)に指定
           cache: ${{ steps.detect-package-manager.outputs.manager }}
 
       - name: Setup Pages
-        uses: actions/configure-pages@v4
+        uses: actions/configure-pages@v5
 
       - name: Install dependencies
         run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
